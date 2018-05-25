@@ -18,6 +18,9 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.JList;
 import java.awt.Component;
+import javax.swing.Box;
+import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
 
 public class frmGarage extends JFrame {
 
@@ -52,11 +55,15 @@ public class frmGarage extends JFrame {
 	private JPanel panelListe;
 	private JButton btnNuovoVeicolo;
 	private JButton btnAddParcoVeicoli;
-	private JList list;
-	private JPanel panel;
-	private JList list_1;
+	private JList listParcoVeicoli;
+	private JPanel panelTrasferisci;
+	private JList listGarage;
 	private JButton btnNewButton;
 	private JButton btnNewButton_1;
+	private Component horizontalGlue;
+	private JButton btnCancellaDati;
+	private JScrollPane scrollPaneVeicoli;
+	private JPanel panelDatiFurgone;
 
 	/**
 	 * Launch the application.
@@ -79,7 +86,7 @@ public class frmGarage extends JFrame {
 	 */
 	public frmGarage() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 398);
+		setBounds(100, 100, 500, 500);
 		panelRoot = new JPanel();
 		panelRoot.setBorder(new EmptyBorder(5, 5, 5, 5));
 		panelRoot.setLayout(new BorderLayout(0, 0));
@@ -101,19 +108,39 @@ public class frmGarage extends JFrame {
 		rdbtnAuto = new JRadioButton("Auto");
 		rdbtnAuto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				textCapacita.setEnabled(false);
-				String s = (String)comboBoxAlimentazione.getSelectedItem();
-				lblErrore.setText(s);
+				abilitaPanelAuto(true);
+				abilitaPanelMoto(false);
+				abiltaPanelFurgone(false) ;
+				
 			}
 		});
+		
 		buttonGroup.add(rdbtnAuto);
 		panelOpzioniVeicoli.add(rdbtnAuto);
 		
 		rdbtnFurgone = new JRadioButton("Furgone");
+		rdbtnFurgone.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				abilitaPanelAuto(false);
+				abilitaPanelMoto(false);
+				abiltaPanelFurgone(true) ;
+				
+			}
+		});
+		
 		buttonGroup.add(rdbtnFurgone);
 		panelOpzioniVeicoli.add(rdbtnFurgone);
 		
 		rdbtnMoto = new JRadioButton("Moto");
+		rdbtnMoto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				abilitaPanelAuto(false);
+				abilitaPanelMoto(true);
+				abiltaPanelFurgone(false) ;
+				
+			}
+		});
+		
 		buttonGroup.add(rdbtnMoto);
 		panelOpzioniVeicoli.add(rdbtnMoto);
 		
@@ -168,7 +195,7 @@ public class frmGarage extends JFrame {
 		comboBoxAlimentazione.setModel(new DefaultComboBoxModel(new String[] {"Benzina", "Diesel"}));
 		panelDatiAuto.add(comboBoxAlimentazione);
 		
-		JPanel panelDatiFurgone = new JPanel();
+		panelDatiFurgone = new JPanel();
 		panelDatiFurgone.setBorder(new TitledBorder(null, "Dati Furgone", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_Y.add(panelDatiFurgone);
 		
@@ -192,9 +219,16 @@ public class frmGarage extends JFrame {
 		
 		panelPulsanti = new JPanel();
 		panel_Y.add(panelPulsanti);
+		panelPulsanti.setLayout(new BoxLayout(panelPulsanti, BoxLayout.X_AXIS));
 		
 		btnNuovoVeicolo = new JButton("Nuovo Veicolo");
 		panelPulsanti.add(btnNuovoVeicolo);
+		
+		btnCancellaDati = new JButton("Cancella dati");
+		panelPulsanti.add(btnCancellaDati);
+		
+		horizontalGlue = Box.createHorizontalGlue();
+		panelPulsanti.add(horizontalGlue);
 		
 		btnAddParcoVeicoli = new JButton("Add Parco Veicoli");
 		panelPulsanti.add(btnAddParcoVeicoli);
@@ -203,23 +237,57 @@ public class frmGarage extends JFrame {
 		panel_Y.add(panelListe);
 		panelListe.setLayout(new GridLayout(1, 3, 2, 2));
 		
-		list_1 = new JList();
-		panelListe.add(list_1);
+		listGarage = new JList();
+		panelListe.add(listGarage);
 		
-		panel = new JPanel();
-		panelListe.add(panel);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panelTrasferisci = new JPanel();
+		panelListe.add(panelTrasferisci);
+		panelTrasferisci.setLayout(new BoxLayout(panelTrasferisci, BoxLayout.Y_AXIS));
 		
 		btnNewButton_1 = new JButton("-->");
 		btnNewButton_1.setAlignmentX(Component.CENTER_ALIGNMENT);
-		panel.add(btnNewButton_1);
+		panelTrasferisci.add(btnNewButton_1);
 		
 		btnNewButton = new JButton("<--");
 		btnNewButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		panel.add(btnNewButton);
+		panelTrasferisci.add(btnNewButton);
 		
-		list = new JList();
-		panelListe.add(list);
+		
+		
+		listParcoVeicoli = new JList();
+		panelListe.add(listParcoVeicoli);
+		
+		scrollPaneVeicoli = new JScrollPane(listParcoVeicoli);
+		panelListe.add(scrollPaneVeicoli);
+		
+		
+		// Impostazioni iniziali 
+		rdbtnAuto.setSelected(true);
+		abilitaPanelMoto(false);
+		abiltaPanelFurgone(false);
+	
+		
 	}
-
+	
+	
+	private void abilitaPanelMoto(boolean abilitato) {
+		panelDatiMoto.setEnabled(abilitato);
+		textTempi.setEnabled(abilitato);
+		lblTempi.setEnabled(abilitato);
+		
+	}
+	
+	private void abiltaPanelFurgone(boolean abilitato) {
+		panelDatiFurgone.setEnabled(abilitato);
+		lblCapacita.setEnabled(abilitato);
+		textCapacita.setEnabled(abilitato);
+	}
+	
+	private void abilitaPanelAuto(boolean abilitato) {
+		panelDatiAuto.setEnabled(abilitato);
+		lblNPorte.setEnabled(abilitato);
+		comboBoxNPorte.setEditable(abilitato);
+		lblAlimentazione.setEnabled(abilitato);
+		comboBoxAlimentazione.setEnabled(abilitato);
+	}
 }
